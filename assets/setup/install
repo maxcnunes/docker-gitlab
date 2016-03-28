@@ -27,6 +27,16 @@ chown -R git:git /home/git/gitlab/
 
 cd /home/git/gitlab
 
+# Fix: undefined method `success?' for nil:NilClass
+# https://gitlab.com/gitlab-org/gitlab-ce/issues/172
+sed -i -- 's%project.satellite.create%#project.satellite.create%g' /home/git/gitlab/lib/tasks/gitlab/enable_automerge.rake
+sed -i -- 's%if $?.success?%if project.satellite.create%g' /home/git/gitlab/lib/tasks/gitlab/enable_automerge.rake
+
+# Fix: Could not find modernizr-2.6.2 in any of the sources
+# http://stackoverflow.com/questions/22825497/installing-gitlab-missing-modernizer/22827382#22827382
+sed -i -- 's/modernizr/modernizr-rails/g' /home/git/gitlab/Gemfile
+sed -i -- 's/modernizr/modernizr-rails/g' /home/git/gitlab/Gemfile.lock
+
 # copy default configurations
 cp /app/setup/config/nginx/gitlab /etc/nginx/sites-available/gitlab
 sudo -u git -H cp /app/setup/config/gitlabhq/gitlab.yml config/gitlab.yml

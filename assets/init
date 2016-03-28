@@ -54,7 +54,11 @@ echo "root:$ROOT_PASSWORD" | chpasswd
 echo User: root Password: $ROOT_PASSWORD
 
 # start supervisord
-/usr/bin/supervisord
+# Fix: unix:///var/run/supervisor.sock refused connection
+# https://github.com/docker/docker/issues/12080#issuecomment-162000092
+sed -i 's#/var/run//supervisor.sock#/dev/shm/supervisor.sock#g'  /etc/supervisor/supervisord.conf
+touch /dev/shm/supervisor.sock
+/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
 
 # over write default configuration templates
 if [ -d /home/git/data/config ]; then
